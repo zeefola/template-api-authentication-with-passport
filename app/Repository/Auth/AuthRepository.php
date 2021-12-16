@@ -43,12 +43,9 @@ class AuthRepository
     public function registerUser($input): array
     {
         $name = $input['name'];
-        $username = $input['username'];
         $phone_number = $input['phone_number'];
         $email = filter_var($input['email'], FILTER_SANITIZE_EMAIL);
-        $hear_about_us = $input['hear_about_us'] ?? null;
         $password = $input['password'];
-        $source = $input['source'] ?? null;
 
         $emailExists = $this->user->where('email', $email)
             ->first();
@@ -74,18 +71,6 @@ class AuthRepository
             ];
         }
 
-        $usernameExists = $this->user->getModel()->where('username', 'LIKE', $username)
-            ->first();
-
-        if ($usernameExists) {
-            return [
-                'error' => true,
-                'msg' => [
-                    'username' => array(['Username already exist'])
-                ]
-            ];
-        }
-
         $uuid = "";
         try {
             $uuid = Uuid::uuid4();
@@ -96,29 +81,16 @@ class AuthRepository
         $confirmation_code = Str::random(20);
         $confirm = rand(111111, 999999);
 
-        $marketing_app = false;
-
-        if ($source == "MARKETING") {
-            $marketing_app = true;
-        }
-
         $this->user->create([
             'user_id' => $id,
             'name' => $name,
-            'username' => $username,
             'phone_number' => $phone_number,
             'email' => $email,
-            'hear_about_us' => $hear_about_us,
             'password' => bcrypt($password),
             'remember_token' => $confirmation_code,
             'activation_created' => Carbon::now(),
             'confirm_code' => $confirm,
-            'marketing_app' => $marketing_app,
             'created_at' => Carbon::now()
-        ]);
-
-        $this->settings->create([
-            'user' => $id
         ]);
 
         $url = config('app.frontend_url') . '/confirm-account?email=' . $email . '&token=' . $confirmation_code;
