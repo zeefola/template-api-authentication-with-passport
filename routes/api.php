@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('/login', [AuthController::class, 'userLogin']);
+Route::post('/register', [AuthController::class, 'registerUser']);
+Route::post('/confirm-account', [AuthController::class, 'confirmAccount']);
+Route::post('/confirm-mobile-code', [AuthController::class, 'confirmCode']);
+Route::post('/resend-confirmation-code', [AuthController::class, 'resendCode']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+
+Route::group(['middleware' => 'auth:api'],  function () {
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
