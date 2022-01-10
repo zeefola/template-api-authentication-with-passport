@@ -117,7 +117,7 @@ class AuthRepository
      * @param $token
      * @return void
      */
-    public function confirmAccount($email, $token)
+    public function confirm($email, $token)
     {
         $user = $this->user->findBy('email', $email);
 
